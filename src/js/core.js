@@ -35,25 +35,6 @@ var alreadyNotifiedByClick = false
 
 chrome.contextMenus.removeAll(function() {
 
-  let endDate = new Date(2019, 0, 24, 23, 59, 0, 0)
-  let today = new Date()
-  
-  var oneDay = 24*60*60*1000; // hours*minutes*seconds*milliseconds
-  let remainingDays = Math.round((endDate.getTime() - today.getTime())/(oneDay));
-
-  if (remainingDays >= 0) {
-    var contextMenuId2 = chrome.contextMenus.create({
-      "title": `⏰ ${remainingDays} days to support next release of QJS on KickStarter! 🡆`,
-      "type": "normal",
-      "contexts": ["browser_action"],
-      "onclick": openKickStarter()
-    });
-  }
-  var contextMenuIdSeparator = chrome.contextMenus.create({
-    "type": "separator",
-    "contexts": ["browser_action"]
-  });
-
   var contextMenuId3 = chrome.contextMenus.create({
     "id": "toggleJavascript",
     "title": "Toggle JavaScript",
@@ -71,75 +52,6 @@ chrome.contextMenus.removeAll(function() {
   
 
 })
-
-
-function setKickStarterBadge(delay = 0, notifiedByClick = false) {
-  
-  let endDate = new Date(2019, 0, 24, 23, 59, 0, 0)
-  let today = new Date()
-  
-  var oneDay = 24*60*60*1000; // hours*minutes*seconds*milliseconds
-  let remainingDays = Math.round((endDate.getTime() - today.getTime())/(oneDay));
-
-//new Date(license.createdTime).toLocaleDateString("en", {year: "numeric", month: "long", day: "numeric"})
-  //if (!alreadyRun) {
-    
-    clearTimeout(timer);
-    
-
-    if (!alreadyNotifiedByClick && remainingDays >= 0) {
-
-      timer = setTimeout(() => {
-
-        
-
-        clearInterval(loading)
-        alreadyRun = true
-        let space = 6
-        let sentence = `   ...⏰    ${remainingDays} days to support the next release on kickstarter!...   ❤️    `
-
-
-        let spinner = {
-          interval: 150,
-          frames: sentence.split('')
-        }
-
-        let i = -1;
-
-          loading = setInterval(() => {
-          
-            const frames = spinner.frames;
-
-        
-            i = ++i
-
-            let letter1 = i > 0 && i < frames.length - 1 ? frames[i % frames.length] : ''
-            let letter2 = i > 1 && i < frames.length - 2 ? frames[(i + 1) % frames.length] : ''
-            let letter3 = i > 2 && i < frames.length - 3 ? frames[(i + 2) % frames.length] : ''
-            let letter4 = i > 3 && i < frames.length - 4 ? frames[(i + 3) % frames.length] : ''
-            let letter5 = i > 4 && i < frames.length - 5 ? frames[(i + 4) % frames.length] : ''
-            let letter6 = i > 5 && i < frames.length - 6 ? frames[(i + 5) % frames.length] : ''
-            chrome.browserAction.setBadgeText({
-              text: letter1 + letter2 + letter3 + letter4 + letter5 + letter6
-            })
-            
-            if (i == frames.length - 1) {
-              clearInterval(loading)
-              alreadyRun = false
-            }
-
-          }, spinner.interval);
-
-        }, delay);
-
-        alreadyNotifiedByClick = notifiedByClick
-
-    }
-
-  //}
-
-}
-
 
 init();
 
@@ -289,11 +201,6 @@ function getSettings() {
           'incognito': incognito
         },
         function (details) {
-
-          if (details.setting == 'block') {
-            setKickStarterBadge(1000, true)
-          }
-
           //console.info("Current tab settings : "+url);
           url ? matchForbiddenOrigin = url.match(forbiddenOrigin, '') : matchForbiddenOrigin = true;
           matchForbiddenOrigin ? updateIconAndMenu("inactive") : updateIconAndMenu(details.setting);
@@ -305,9 +212,6 @@ function getSettings() {
 
 
 function changeSettings() {
-
-  setKickStarterBadge(1000, true)
-
   if (!matchForbiddenOrigin) {
     chromeContentSettings.javascript.get({
         'primaryUrl': url,
@@ -616,15 +520,6 @@ function openJsPanel() {
   };
 }
 
-function openKickStarter() {
-  return function (info, tab) {
-    chrome.tabs.create({
-      "url": "https://www.kickstarter.com/projects/376707762/337761327",
-      "selected": true
-    });
-  };
-}
-
 function initIncognitoClear() {
 
 
@@ -654,13 +549,6 @@ function initIncognitoClear() {
 
   });
 }
-
-chrome.runtime.onStartup.addListener(function () {
-  setKickStarterBadge()
-})
-chrome.runtime.onInstalled.addListener(function () {
-  setKickStarterBadge()
-})
 
 
 
